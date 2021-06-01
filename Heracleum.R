@@ -494,7 +494,6 @@ holdotTable$pred <- predict(rf, hddata_only_pres, type = "prob")[,2]
 precrec_hd <- evalmod(scores = holdotTable$pred, labels = holdotTable$Species)
 
 
-
 ##HOLDOUT map prediction
 ##Make map prediction
 library(mecofun)
@@ -539,35 +538,13 @@ hs_hd_absence <- st_as_sf(hd.xy, coords = c("x", "y"), crs = crs(awt))
 plot(hs_hd_absence[which(hs_hd_absence$Species==0), ], pch = 2, col="blue", add=TRUE) # add absence points
 
 require('caret')
-require('e1071')
-df <- data.frame(predicted = r_pred_hd$thr1, actual = hd.xy$Species)
-#assuming pred column contains the predicted species
-confusionMatrix(data = df$predicted, reference = df$actual)
-class(df$actual)
-length(which(df$predicted == "0" & df$actual=='1'))
 
-
-df<-df%>%mutate(New_Column = case_when(
-  is.na(Age) & Pclass==1 ~ 40,
-  is.na(Age) & Pclass==2 ~ 30,
-  is.na(Age) & Pclass==3 ~ 25,
-  TRUE~Age
-))
-
-rf.confusionMatrix <- confusionMatrix(rf.class , data.test$Class, positive = "T")
-
-
-example <- confusionMatrix(data=df$predicted, reference = df$actual)
 
 
 
 library(dplyr)
 url = 'https://gist.githubusercontent.com/michhar/2dfd2de0d4f8727f873422c5d959fff5/raw/ff414a1bcfcba32481e4d4e8db578e55872a2ca1/titanic.csv'
 df_ex = read.csv(url, sep="\t")
-
-
-
-
 
 
 
@@ -642,21 +619,6 @@ jpeg(
 map_c
 dev.off()
 
-summary(map_c)
-
-##3d curves
-partial_response(rf,predictors = bio_curr_df)
-
-library(RColorBrewer)
-library(lattice)
-# We prepare the response surface by making a dummy data set where two predictor variables range from their minimum to maximum value, and the remaining predictor is kept constant at its mean:
-xyz <- data.frame(expand.grid(seq(min(avi_df[,pred[1]]),max(avi_df[,pred[1]]),length=50), seq(min(avi_df[,pred[2]]),max(avi_df[,pred[2]]),length=50)), mean(avi_df[,pred[3]]))
-names(xyz) <- pred
-
-# Make predictions
-xyz$z <- predict(m_glm, xyz, type='response')
-summary(xyz)
-pa
 
 
 
@@ -811,73 +773,11 @@ knitr::opts_chunk$set(fig.width=12, fig.height=8)
 summary(bio_fut_df)
 
 
-myBiomodModelOut <- c(my_model, rf)
-myBiomodProjection <- BIOMOD_Projection(modeling.output = myBiomodModelOut,
-                                        new.env = awt,
-                                        proj.name = 'current',
-                                        selected.models = 'all',
-                                        binary.meth = 'ROC',
-                                        compress = FALSE,
-                                        build.clamping.mask = FALSE)
-pa
 
 
-## For ensemble
-rf1 <- rf
-prediction1 <- bio_fut_df[,c(1,2,9)]
 
-rf2 <- rf
-prediction2 <- bio_fut_df[,c(1,2,9)]
 
-rf3 <- rf
-prediction3 <- bio_fut_df[,c(1,2,9)]
 
-rf4 <- rf
-prediction4 <- bio_fut_df[,c(1,2,9)]
-
-rf5 <- rf
-prediction5 <- bio_fut_df[,c(1,2,9)]
-
-rf6 <- rf
-prediction6 <- bio_fut_df[,c(1,2,9)]
-
-rf7 <- rf
-prediction7 <- bio_fut_df[,c(1,2,9)]
-
-rf8 <- rf
-prediction8 <- bio_fut_df[,c(1,2,9)]
-
-rf9 <- rf
-prediction9 <- bio_fut_df[,c(1,2,9)]
-
-rf10 <- rf
-prediction10 <- bio_fut_df[,c(1,2,9)]
-
-prediction10$pred_rf10 <- prediction10$pred_rf
-prediction10 <- prediction10[, c(1,2,4)]
-
-dataframe_ensemble <- merge(dataframe_ensemble,prediction10)
-
-dataframe_ensemble$pred_avg<-(dataframe_ensemble$pred_rf+dataframe_ensemble$pred_rf2+dataframe_ensemble$pred_rf3+dataframe_ensemble$pred_rf4+dataframe_ensemble$pred_rf5+dataframe_ensemble$pred_rf6+dataframe_ensemble$pred_rf7+dataframe_ensemble$pred_rf8+dataframe_ensemble$pred_rf9+dataframe_ensemble$pred_rf10)/10
-
-ensemble_pred_fut <- rasterFromXYZ(dataframe_ensemble[,-c(3:12)])
-plot(ensemble_pred_fut)
-
-map_ensemble <- gplot(ensemble_pred_fut) +
-  geom_tile(aes(fill = value)) +
-  scale_fill_gradientn(colours = c("#2c7bb6", "#abd9e9", "#ffffbf", "#fdae61", "#d7191c"),
-                       na.value = "transparent",
-                       name = "Probability") +
-  labs(title = "Future projection of habitat suitability
-       for H.S. in 2040-2060",
-       x = "longitude",
-       y = "latitude") +
-  scale_x_continuous(expand = c(0, 0)) +
-  scale_y_continuous(expand = c(0, 0)) +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5),
-        axis.ticks.x = element_blank(),
-        axis.ticks.y = element_blank())
 
 leaf_map_fut <- bio_fut_df[,c(1,2,10)]
 leaf_map_fut1 <- leaf_map_fut[leaf_map_fut$thr1 != 0, ] 

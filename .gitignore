@@ -1,6 +1,9 @@
 # NetCDF files 
+.Rhistory
+.RData
 *.nc
 .Rproj.user
+.vscode
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
